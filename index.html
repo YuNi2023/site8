@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>広告クリック後リンク表示</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    /* 広告エリア */
+    #adContainer {
+      display: inline-block;
+      border: 2px solid #ccc;
+      background-color: #fff;
+      padding: 10px;
+      cursor: pointer;
+    }
+    /* リンク表示エリア（初期は非表示） */
+    #linkContainer {
+      margin-top: 30px;
+      display: none;
+    }
+    #linkContainer a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    #linkContainer a:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>広告クリック後リンク表示</h1>
+  <p>下の広告をクリックし、広告ページで60秒以上経過してからこちらのページに戻るとリンクが表示されます。</p>
+
+  <!-- 広告エリア -->
+  <div id="adContainer">
+    <!-- admax -->
+    <script src="https://adm.shinobi.jp/s/a11e63411f45adabebe16661a54d5a95"></script>
+    <!-- admax -->
+  </div>
+
+  <!-- リンク表示エリア -->
+  <div id="linkContainer"></div>
+
+  <script>
+    // 必要な離脱時間（ミリ秒）：60秒
+    const REQUIRED_LEAVE_TIME = 60 * 1000;
+
+    // 表示したいリンク先をBase64エンコードした文字列
+    // この例では "https://gofile.io/d/YPi1ZF" をエンコードした結果です
+    const encodedLink = "aHR0cHM6Ly9nb2ZpbGUuaW8vZC9ZUGkxWkY=";
+
+    // ページが非表示になった（タブを離れた）時刻を記録する変数
+    let hiddenTime = null;
+
+    // ページの表示状態の変化を監視
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) {
+        hiddenTime = Date.now();
+      } else {
+        if (hiddenTime !== null) {
+          const elapsed = Date.now() - hiddenTime;
+          if (elapsed >= REQUIRED_LEAVE_TIME) {
+            showLink();
+          } else {
+            alert("まだ60秒経過していません。広告ページで60秒以上ご覧になってから戻ってきてください。");
+          }
+          hiddenTime = null;
+        }
+      }
+    });
+
+    // リンク表示のための関数
+    function showLink() {
+      const linkContainer = document.getElementById("linkContainer");
+      if (linkContainer.children.length > 0) return;
+      // Base64をデコードして実際のURLを取得
+      const decodedLink = atob(encodedLink);
+      const anchor = document.createElement("a");
+      anchor.href = decodedLink;
+      anchor.target = "_blank";
+      // ボタンテキストを「ダウンロードページへ移動する」に設定
+      anchor.textContent = "ダウンロードページへ移動する";
+      linkContainer.appendChild(anchor);
+      linkContainer.style.display = "block";
+    }
+  </script>
+</body>
+</html>
